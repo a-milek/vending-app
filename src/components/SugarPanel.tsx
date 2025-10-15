@@ -51,7 +51,7 @@ const SugarPanel = ({
 }: Props) => {
   return (
     <>
-      <HStack gap={5} py={2} paddingTop="40px" width="70%" mx="auto">
+      <HStack gap={5} py={2} paddingTop="40px" width="80%" mx="auto">
         <Box
           width="33%"
           style={
@@ -124,7 +124,7 @@ const SugarPanel = ({
         </Box>
       </HStack>
       <VStack gap={2} paddingY={2} height="7vh">
-        <SimpleGrid columns={1} gap={3} height="100%" width="65%" mx="auto">
+        <SimpleGrid columns={1} gap={3} height="100%" width="80%" mx="auto">
           <GridItem>
             <Button
               onClick={() => onClick(key_config.cukier)}

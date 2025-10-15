@@ -105,9 +105,9 @@ const TechKeyboard = ({ onClick, getCurrentPrice }: NumPadProps) => {
 
   return (
     <>
-      {console.log(status)}
+      {status}
       <VStack gap={2}>
-        <SimpleGrid columns={2} gap={3} height="100%" width="70%" mx="auto">
+        <SimpleGrid columns={2} gap={3} height="100%" width="80%" mx="auto">
           <GridItem>
             <Button onClick={() => onClick(key_config.enter)} {...ButtonStyle}>
               Enter
