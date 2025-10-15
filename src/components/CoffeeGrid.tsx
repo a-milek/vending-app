@@ -37,6 +37,8 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
     null
   );
 
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
+
   // Track selected (highlighted) coffee index:
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -66,7 +68,7 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
     if (selectedIndex !== null) {
       const timeout = setTimeout(() => {
         setSelectedIndex(null);
-      }, 7000); // 10 seconds
+      }, 7000); // 7 seconds
 
       return () => clearTimeout(timeout); // Cleanup if index changes before 10s
     }
@@ -111,8 +113,17 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
   };
 
   const handleCoffeeClick = (index: number) => {
+    if (!tech && buttonsDisabled) return;
     setSelectedIndex(index);
+    if (!tech) setButtonsDisabled(true);
     onClick(index);
+
+    if (!tech) {
+      setTimeout(() => {
+        setSelectedIndex(null);
+        setButtonsDisabled(false);
+      }, 7000);
+    }
   };
 
   const handleSetIndexClick = (index: number) => {
@@ -136,7 +147,7 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
         gap={5}
         paddingY={5}
         height="100%"
-        width={tech ? "50%" : "70%"}
+        width={tech ? "50%" : "80%"}
         mx="auto"
       >
         {coffeeList.map((coffee, index) => (

@@ -45,7 +45,7 @@ const PhotoEditModal = ({ isOpen, onClose, onSave }: Props) => {
     setInputValue(src);
   };
 
-  console.log("iconSrcs", iconSrcs);
+  // console.log("iconSrcs", iconSrcs);
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
       <ModalOverlay />

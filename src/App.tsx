@@ -20,6 +20,7 @@ function App() {
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasCredit, setHasCredit] = useState(false);
+  const [isOrdering, setIsOrdering] = useState(false);
 
   // --- Price & order control ---
   const [current, setCurrentPrice] = useState<number | null>(null);
@@ -89,7 +90,7 @@ function App() {
     };
   }, [connectWebSocket]);
 
-//  --- Idle Timer ---
+  //  --- Idle Timer ---
   useIdleTimer({
     timeout: 1000 * 120, // 2 minutes
     debounce: 500,
@@ -124,7 +125,7 @@ function App() {
 
   // --- Order Logic ---
   const placeOrder = async (servId: string | number) => {
-    console.log(servId)
+    console.log(servId);
     try {
       const res = await fetch("order", {
         method: "POST",
@@ -138,21 +139,37 @@ function App() {
     }
   };
 
+  const firstClickHandled = useRef(false);
   const handleCoffeeSelection = async (index: number) => {
+    if (!tech && isOrdering) return;
+
     const coffee = coffeeList[index];
-    
-     if (coffee.name.toLowerCase().includes('zbożowa') || coffee.name.toLowerCase().includes('zbożowe')) {
-    try {
-      await placeOrder(11);
-    } catch (error) {
-      console.error('Failed to place order:', error);
+
+    // Start lockout on first click only
+    if (!tech && !firstClickHandled.current) {
+      setIsOrdering(true);
+      firstClickHandled.current = true;
+      setTimeout(() => {
+        setIsOrdering(false);
+        firstClickHandled.current = false; // reset for next series
+      }, 7000);
     }
-  }
-     await new Promise(resolve => setTimeout(resolve, 1000));
-  
     try {
+      // --- Special case: zbożowa ---
+      if (
+        coffee.name.toLowerCase().includes("zbożowa") ||
+        coffee.name.toLowerCase().includes("zbożowe")
+      ) {
+        await placeOrder(11);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
       await placeOrder(coffee.servId);
-    } catch {}
+    } catch (err) {
+      console.error("Order failed:", err);
+    } finally {
+      if (!tech) setTimeout(() => setIsOrdering(false), 7000);
+    }
   };
 
   useEffect(() => {
