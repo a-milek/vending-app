@@ -20,6 +20,7 @@ const LCD_Simulator = ({ lines, sugar, tech }: Props) => {
       height="100%"
       borderWidth="1px"
       borderRadius="lg"
+      borderColor={"grey"}
       bgImage="url('https://via.placeholder.com/300')"
       bgSize="cover"
       aspectRatio={1}

@@ -25,9 +25,16 @@ interface Props {
   tech: boolean;
   coffeeList: CoffeeType[];
   setCoffeeList: React.Dispatch<React.SetStateAction<CoffeeType[]>>;
+  buttonsDisabled?: boolean;
 }
 
-const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
+const CoffeeGrid = ({
+  onClick,
+  tech,
+  coffeeList,
+  setCoffeeList,
+  buttonsDisabled,
+}: Props) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNameIndex, setEditingNameIndex] = useState<number | null>(null);
   const [editingPhotoIndex, setEditingPhotoIndex] = useState<number | null>(
@@ -37,11 +44,7 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
     null
   );
 
-  const [buttonsDisabled, setButtonsDisabled] = useState(false);
-
-  // Track selected (highlighted) coffee index:
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
   const photoModal = useDisclosure();
   const priceModal = useDisclosure();
   const nameModal = useDisclosure();
@@ -115,15 +118,7 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
   const handleCoffeeClick = (index: number) => {
     if (!tech && buttonsDisabled) return;
     setSelectedIndex(index);
-    if (!tech) setButtonsDisabled(true);
     onClick(index);
-
-    if (!tech) {
-      setTimeout(() => {
-        setSelectedIndex(null);
-        setButtonsDisabled(false);
-      }, 7000);
-    }
   };
 
   const handleSetIndexClick = (index: number) => {
@@ -143,7 +138,7 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
   return (
     <>
       <SimpleGrid
-        columns={4}
+        columns={3}
         gap={5}
         paddingY={5}
         height="100%"

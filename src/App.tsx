@@ -139,36 +139,46 @@ function App() {
     }
   };
 
-  const firstClickHandled = useRef(false);
+  // const firstClickHandled = useRef(false);
   const handleCoffeeSelection = async (index: number) => {
     if (!tech && isOrdering) return;
 
     const coffee = coffeeList[index];
+    setIsOrdering(true);
 
-    // Start lockout on first click only
-    if (!tech && !firstClickHandled.current) {
-      setIsOrdering(true);
-      firstClickHandled.current = true;
-      setTimeout(() => {
-        setIsOrdering(false);
-        firstClickHandled.current = false; // reset for next series
-      }, 7000);
-    }
     try {
+      let success = true;
+
       // --- Special case: zbożowa ---
-      if (
-        coffee.name.toLowerCase().includes("zbożowa") ||
-        coffee.name.toLowerCase().includes("zbożowe")
-      ) {
-        await placeOrder(11);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      // if (
+      //   coffee.name.toLowerCase().includes("zbożowa") ||
+      //   coffee.name.toLowerCase().includes("zbożowe")
+      // ) {
+      //   const first = await placeOrder(11);
+      //   await new Promise((resolve) => setTimeout(resolve, 1000));
+      //   const second = await placeOrder(11);
+      //   await new Promise((resolve) => setTimeout(resolve, 2000));
+      //   success = first && second;
+      // }
+
+      const result = await placeOrder(coffee.servId);
+      success = success && result;
+
+      if (!success) {
+        console.warn("Order failed — unlocking buttons immediately");
+        setIsOrdering(false);
+        console.warn(" Nie udało się wysłać zamówienia. Spróbuj ponownie.");
+        return;
       }
 
-      await placeOrder(coffee.servId);
+      // normal 7s block if successful
+      setTimeout(() => {
+        setIsOrdering(false);
+      }, 7000);
     } catch (err) {
       console.error("Order failed:", err);
-    } finally {
-      if (!tech) setTimeout(() => setIsOrdering(false), 7000);
+      setIsOrdering(false);
+      alert("Błąd połączenia z maszyną. Spróbuj ponownie.");
     }
   };
 
@@ -216,7 +226,7 @@ function App() {
 
         {loading || ready ? (
           <>
-            console.log(loading);
+            {/* console.log(loading); */}
             <LoadingScreen progress={progress} ready={ready} />
             <VisuallyHidden>
               <SugarPanel
@@ -261,6 +271,7 @@ function App() {
               setCoffeeList={setCoffeeList}
               onClick={handleCoffeeSelection}
               tech={tech}
+              buttonsDisabled={isOrdering}
             />
           </>
         )}

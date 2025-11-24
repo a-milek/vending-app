@@ -44,7 +44,7 @@ const ScreenInterpreter = ({
       let line = newLines[i];
 
       // Cukier
-      if (line.startsWith("Woda")) {
+      if (line.startsWith("Woda") || line.startsWith("Cukier")) {
         sugarCount = [...line].filter((ch) => ch === "\x01").length;
         newLines[i] = "\u00A0";
         continue;
@@ -57,15 +57,6 @@ const ScreenInterpreter = ({
       );
       if (progressCodes.length > 0) {
         setLoading(true);
-        foundProgress = true;
-        const sum = progressCodes.reduce((a, b) => a + b, 0);
-        const percent = Math.round((sum / 126) * 100);
-        console.log(percent);
-        if (percent == 100) {
-          setReady(true);
-        }
-
-        setProgress(percent);
       }
 
       // Tryb techniczny i gotowość
