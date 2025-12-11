@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Flex, Image, Box, Progress, Heading } from "@chakra-ui/react";
+import { Flex, Image, Box, Heading } from "@chakra-ui/react";
 
 interface Props {
   progress: number;
   ready: boolean;
 }
 
-export default function LoadingScreen({ progress, ready }: Props) {
+export default function LoadingScreen({ ready }: Props) {
   const [showReady, setShowReady] = useState(false);
 
   useEffect(() => {
@@ -27,7 +27,6 @@ export default function LoadingScreen({ progress, ready }: Props) {
       position="relative"
       direction="column"
     >
-      
       <Image
         src="assets/coffee-2.gif"
         alt="Brewing coffee..."
@@ -47,32 +46,33 @@ export default function LoadingScreen({ progress, ready }: Props) {
         textAlign="center"
         height="20%"
       >
-        {showReady ? (
-          <Box height="5vh">
-            <Heading
-              color="white"
-              fontSize={"50px"}
-              fontWeight="bold"
-              background="blackAlpha.800"
-            >
-              ODBIERZ PRODUKT
-            </Heading>
-          </Box>
-        ) : (
-          <Progress
-            value={progress}
-            size="lg"
-            height="5vh"
-            variant="outline"
-            sx={{
-              borderColor: "white",
-              background: "black",
-              "& > div": {
-                backgroundColor: "white",
-              },
-            }}
-          />
-        )}
+        {
+          showReady ? (
+            <Box height="5vh">
+              <Heading
+                color="white"
+                fontSize={"50px"}
+                fontWeight="bold"
+                background="blackAlpha.800"
+              >
+                ODBIERZ PRODUKT
+              </Heading>
+            </Box>
+          ) : null
+          // <Progress
+          //   value={progress}
+          //   size="lg"
+          //   height="5vh"
+          //   variant="outline"
+          //   sx={{
+          //     borderColor: "white",
+          //     background: "black",
+          //     "& > div": {
+          //       backgroundColor: "white",
+          //     },
+          //   }}
+          // />
+        }
       </Box>
     </Flex>
   );
