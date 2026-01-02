@@ -26,6 +26,7 @@ interface Props {
   coffeeList: CoffeeType[];
   setCoffeeList: React.Dispatch<React.SetStateAction<CoffeeType[]>>;
   buttonsDisabled?: boolean;
+  current: number | null;
 }
 
 const CoffeeGrid = ({
@@ -34,7 +35,8 @@ const CoffeeGrid = ({
   coffeeList,
   setCoffeeList,
   buttonsDisabled,
-}: Props) => {
+}: // current,
+Props) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNameIndex, setEditingNameIndex] = useState<number | null>(null);
   const [editingPhotoIndex, setEditingPhotoIndex] = useState<number | null>(

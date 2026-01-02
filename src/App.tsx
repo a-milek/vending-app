@@ -124,7 +124,7 @@ function App() {
   });
 
   // --- Order Logic ---
-  const placeOrder = async (servId: string | number) => {
+  const click_button = async (servId: string | number) => {
     console.log(servId);
     try {
       const res = await fetch("order", {
@@ -139,13 +139,28 @@ function App() {
     }
   };
 
+  const product_finished = async (product_id: string | number) => {
+    console.log(product_id);
+    try {
+      const res = await fetch("/vending-machines/statservice/order_complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id }),
+      });
+      if (!res.ok) throw new Error("Order failed");
+      return await res.json();
+    } catch (err) {
+      console.error("Order error:", err);
+    }
+  };
+
   // const firstClickHandled = useRef(false);
   const handleCoffeeSelection = async (index: number) => {
     if (!tech && isOrdering) return;
-
+    if (!tech && (isOrdering || current !== null)) return;
     const coffee = coffeeList[index];
-    setIsOrdering(true);
 
+    setIsOrdering(true);
     try {
       let success = true;
 
@@ -161,7 +176,7 @@ function App() {
       //   success = first && second;
       // }
 
-      const result = await placeOrder(coffee.servId);
+      const result = await click_button(coffee.servId);
       success = success && result;
 
       if (!success) {
@@ -198,7 +213,7 @@ function App() {
         <VisuallyHidden>
           <SugarPanel
             tech={tech}
-            onClick={placeOrder}
+            onClick={click_button}
             lines={lines}
             setTech={setTech}
             setProgress={setProgress}
@@ -226,12 +241,11 @@ function App() {
 
         {loading || ready ? (
           <>
-            {/* console.log(loading); */}
             <LoadingScreen progress={progress} ready={ready} />
             <VisuallyHidden>
               <SugarPanel
                 tech={tech}
-                onClick={placeOrder}
+                onClick={click_button}
                 lines={lines}
                 setTech={setTech}
                 setProgress={setProgress}
@@ -242,12 +256,20 @@ function App() {
                 setHasCredit={setHasCredit}
                 clearAutoResumeTimer={clearAutoResumeTimer}
               />
+              <CoffeeGrid
+                coffeeList={coffeeList}
+                setCoffeeList={setCoffeeList}
+                onClick={handleCoffeeSelection}
+                tech={tech}
+                buttonsDisabled={isOrdering}
+                current={current}
+              />
             </VisuallyHidden>
           </>
         ) : (
           <>
             <SugarPanel
-              onClick={placeOrder}
+              onClick={product_finished}
               lines={lines}
               setTech={setTech}
               setProgress={setProgress}
@@ -261,7 +283,7 @@ function App() {
             />
             {tech && (
               <TechKeyboard
-                onClick={placeOrder}
+                onClick={click_button}
                 getCurrentPrice={getCurrentPrice}
               />
             )}
@@ -269,9 +291,11 @@ function App() {
             <CoffeeGrid
               coffeeList={coffeeList}
               setCoffeeList={setCoffeeList}
-              onClick={handleCoffeeSelection}
+              onClick={product_finished}
+              // onClick={handleCoffeeSelection}
               tech={tech}
               buttonsDisabled={isOrdering}
+              current={current}
             />
           </>
         )}
