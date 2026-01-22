@@ -133,24 +133,51 @@ function App() {
         body: JSON.stringify({ servId }),
       });
       if (!res.ok) throw new Error("Order failed");
-      return await res.json();
+      const data = await res.json();
+
+      // ✅ only after success
+      await product_finished(servId);
+
+      return data;
     } catch (err) {
       console.error("Order error:", err);
     }
   };
-
+  const wait = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
   const product_finished = async (product_id: string | number) => {
     console.log(product_id);
-    try {
-      const res = await fetch("/vending-machines/statservice/order_complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product_id }),
-      });
-      if (!res.ok) throw new Error("Order failed");
-      return await res.json();
-    } catch (err) {
-      console.error("Order error:", err);
+
+    // ⏳ WAIT while loading is true
+    let retries = 50;
+
+    while (loading === true && retries-- > 0) {
+      await wait(200);
+    }
+
+    if (loading) {
+      console.warn("Loading never finished");
+      return;
+    }
+
+    // loading is now false → continue
+    if (ready) {
+      try {
+        const res = await fetch(
+          "/vending-machines/statservice/order_complete",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ product_id }),
+          },
+        );
+
+        if (!res.ok) throw new Error("Order failed");
+
+        return await res.json();
+      } catch (err) {
+        console.error("Order error:", err);
+      }
     }
   };
 
@@ -213,7 +240,7 @@ function App() {
         <VisuallyHidden>
           <SugarPanel
             tech={tech}
-            onClick={click_button}
+            onClick={handleCoffeeSelection}
             lines={lines}
             setTech={setTech}
             setProgress={setProgress}
@@ -259,7 +286,7 @@ function App() {
               <CoffeeGrid
                 coffeeList={coffeeList}
                 setCoffeeList={setCoffeeList}
-                onClick={handleCoffeeSelection}
+                onClick={product_finished}
                 tech={tech}
                 buttonsDisabled={isOrdering}
                 current={current}
@@ -269,7 +296,7 @@ function App() {
         ) : (
           <>
             <SugarPanel
-              onClick={product_finished}
+              onClick={click_button}
               lines={lines}
               setTech={setTech}
               setProgress={setProgress}
@@ -291,7 +318,7 @@ function App() {
             <CoffeeGrid
               coffeeList={coffeeList}
               setCoffeeList={setCoffeeList}
-              onClick={product_finished}
+              onClick={click_button}
               // onClick={handleCoffeeSelection}
               tech={tech}
               buttonsDisabled={isOrdering}
