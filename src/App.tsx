@@ -29,6 +29,7 @@ function App() {
   useEffect(() => {
     currentPriceRef.current = current;
   }, [current]);
+  const lastProductRef = useRef<string | number | null>(null);
 
   // --- Coffee List ---
   const [coffeeList, setCoffeeList] = useState(() => {
@@ -125,98 +126,75 @@ function App() {
 
   // --- Order Logic ---
   const click_button = async (servId: string | number) => {
-    console.log(servId);
+    console.log("order start", servId);
     try {
-      const res = await fetch("order", {
+      const res = await fetch("/vending-machines/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ servId }),
       });
-      if (!res.ok) throw new Error("Order failed");
-      const data = await res.json();
 
-      // ✅ only after success
-      await product_finished(servId);
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Order failed");
+      }
 
-      return data;
+      return await res.json();
     } catch (err) {
       console.error("Order error:", err);
+      return null;
     }
   };
-  const wait = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-  const product_finished = async (product_id: string | number) => {
-    console.log(product_id);
+  const finishedRef = useRef(false);
 
-    // ⏳ WAIT while loading is true
-    let retries = 50;
-
-    while (loading === true && retries-- > 0) {
-      await wait(200);
+  useEffect(() => {
+    if (ready && lastProductRef.current != null && !finishedRef.current) {
+      finishedRef.current = true;
+      product_finished(lastProductRef.current);
     }
 
-    if (loading) {
-      console.warn("Loading never finished");
-      return;
+    if (!ready) {
+      finishedRef.current = false;
     }
+  }, [ready]);
+  const product_finished = async (product_id: string | number | null) => {
+    if (product_id == null) return;
 
-    // loading is now false → continue
-    if (ready) {
-      try {
-        const res = await fetch(
-          "/vending-machines/statservice/order_complete",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ product_id }),
-          },
-        );
+    console.log("called product_finished", product_id);
 
-        if (!res.ok) throw new Error("Order failed");
+    try {
+      const res = await fetch("/vending-machines/statservice/order_complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id }),
+      });
 
-        return await res.json();
-      } catch (err) {
-        console.error("Order error:", err);
-      }
+      if (!res.ok) throw new Error("Statservice failed");
+      return await res.json();
+    } catch (err) {
+      console.error("Statservice error:", err);
     }
   };
 
-  // const firstClickHandled = useRef(false);
   const handleCoffeeSelection = async (index: number) => {
     if (!tech && isOrdering) return;
-    if (!tech && (isOrdering || current !== null)) return;
     const coffee = coffeeList[index];
 
     setIsOrdering(true);
     try {
-      let success = true;
-
-      // --- Special case: zbożowa ---
-      // if (
-      //   coffee.name.toLowerCase().includes("zbożowa") ||
-      //   coffee.name.toLowerCase().includes("zbożowe")
-      // ) {
-      //   const first = await placeOrder(11);
-      //   await new Promise((resolve) => setTimeout(resolve, 1000));
-      //   const second = await placeOrder(11);
-      //   await new Promise((resolve) => setTimeout(resolve, 2000));
-      //   success = first && second;
-      // }
-
       const result = await click_button(coffee.servId);
-      success = success && result;
 
-      if (!success) {
+      if (!result || !result.success) {
         console.warn("Order failed — unlocking buttons immediately");
         setIsOrdering(false);
-        console.warn(" Nie udało się wysłać zamówienia. Spróbuj ponownie.");
         return;
       }
 
-      // normal 7s block if successful
-      setTimeout(() => {
-        setIsOrdering(false);
-      }, 7000);
+      lastProductRef.current = coffee.servId;
+
+      setCurrentPrice(coffee.price);
+
+      setTimeout(() => setIsOrdering(false), 7000);
     } catch (err) {
       console.error("Order failed:", err);
       setIsOrdering(false);
@@ -286,7 +264,7 @@ function App() {
               <CoffeeGrid
                 coffeeList={coffeeList}
                 setCoffeeList={setCoffeeList}
-                onClick={product_finished}
+                onClick={handleCoffeeSelection}
                 tech={tech}
                 buttonsDisabled={isOrdering}
                 current={current}
@@ -318,8 +296,8 @@ function App() {
             <CoffeeGrid
               coffeeList={coffeeList}
               setCoffeeList={setCoffeeList}
-              onClick={click_button}
-              // onClick={handleCoffeeSelection}
+              //onClick={click_button}
+              onClick={handleCoffeeSelection}
               tech={tech}
               buttonsDisabled={isOrdering}
               current={current}
