@@ -11,7 +11,6 @@ import PriceEditModal from "./PriceEditModal";
 import NameEditModal from "./NameEditModal";
 import PhotoEditModal from "./PhotoEditModal";
 import IndexEditModal from "./IndexEditModal";
-import { useEffect } from "react";
 
 interface CoffeeType {
   servId: string;
@@ -25,19 +24,24 @@ interface Props {
   tech: boolean;
   coffeeList: CoffeeType[];
   setCoffeeList: React.Dispatch<React.SetStateAction<CoffeeType[]>>;
+  disabled: boolean;
 }
 
-const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
+const CoffeeGrid = ({
+  onClick,
+  tech,
+  coffeeList,
+  setCoffeeList,
+  disabled,
+}: Props) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingNameIndex, setEditingNameIndex] = useState<number | null>(null);
   const [editingPhotoIndex, setEditingPhotoIndex] = useState<number | null>(
-    null
+    null,
   );
   const [selectedButtonIndex, setSelectedButtonIndex] = useState<number | null>(
-    null
+    null,
   );
-
-  const [buttonsDisabled, setButtonsDisabled] = useState(false);
 
   // Track selected (highlighted) coffee index:
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -64,15 +68,15 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
     updateStorage(updated);
   };
 
-  useEffect(() => {
-    if (selectedIndex !== null) {
-      const timeout = setTimeout(() => {
-        setSelectedIndex(null);
-      }, 7000); // 7 seconds
+  // useEffect(() => {
+  //   if (selectedIndex !== null) {
+  //     const timeout = setTimeout(() => {
+  //       setSelectedIndex(null);
+  //     }, 7000); // 7 seconds
 
-      return () => clearTimeout(timeout); // Cleanup if index changes before 10s
-    }
-  }, [selectedIndex]);
+  //     return () => clearTimeout(timeout); // Cleanup if index changes before 10s
+  //   }
+  // }, [selectedIndex]);
 
   const handleIndexChange = (index: number, inputValue: string) => {
     const n = parseInt(inputValue, 10);
@@ -113,17 +117,10 @@ const CoffeeGrid = ({ onClick, tech, coffeeList, setCoffeeList }: Props) => {
   };
 
   const handleCoffeeClick = (index: number) => {
-    if (!tech && buttonsDisabled) return;
-    setSelectedIndex(index);
-    if (!tech) setButtonsDisabled(true);
-    onClick(index);
+    if (!tech && disabled) return;
 
-    if (!tech) {
-      setTimeout(() => {
-        setSelectedIndex(null);
-        setButtonsDisabled(false);
-      }, 7000);
-    }
+    setSelectedIndex(index); // visual highlight
+    onClick(index);
   };
 
   const handleSetIndexClick = (index: number) => {

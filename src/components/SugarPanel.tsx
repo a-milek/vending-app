@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  GridItem,
-  HStack,
-  Image,
-  SimpleGrid,
-  VStack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Flex, HStack, Image } from "@chakra-ui/react";
 import ScreenInterpreter from "./ScreenInterpreter";
 import key_config from "../config/KeyConfig";
 
@@ -26,16 +16,6 @@ interface Props {
   clearAutoResumeTimer: () => void;
 }
 
-const ButtonStyle = {
-  fontSize: "3xl",
-  background: "#55461B",
-  fontWeight: "semibold",
-  color: "white",
-  width: "100%",
-  height: "100%",
-  variant: "subtle",
-  userSelect: "none" as const,
-};
 const SugarPanel = ({
   onClick,
   lines,
@@ -53,7 +33,7 @@ const SugarPanel = ({
     <>
       <HStack gap={5} py={2} paddingTop="40px" width="80%" mx="auto">
         <Box
-          width="33%"
+          width="25%"
           style={
             {
               touchAction: "none",
@@ -77,7 +57,8 @@ const SugarPanel = ({
         <Flex
           justify="center"
           align="center"
-          width={"33%"}
+          height={}
+          width={"50%"}
           style={
             {
               touchAction: "none",
@@ -102,7 +83,7 @@ const SugarPanel = ({
         </Flex>
 
         <Box
-          width="33%"
+          width="25%"
           style={
             {
               touchAction: "none",
@@ -123,7 +104,7 @@ const SugarPanel = ({
           />
         </Box>
       </HStack>
-      <VStack gap={2} paddingY={2} height="7vh">
+      {/* <VStack gap={2} paddingY={2} height="7vh">
         <SimpleGrid columns={1} gap={3} height="100%" width="80%" mx="auto">
           <GridItem>
             <Button
@@ -140,7 +121,7 @@ const SugarPanel = ({
             </Button>
           </GridItem>
         </SimpleGrid>
-      </VStack>
+      </VStack> */}
     </>
   );
 };

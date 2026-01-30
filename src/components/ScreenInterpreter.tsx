@@ -44,7 +44,7 @@ const ScreenInterpreter = ({
       let line = newLines[i];
 
       // Cukier
-      if (line.startsWith("Woda")) {
+      if (line.startsWith("Cukier")) {
         sugarCount = [...line].filter((ch) => ch === "\x01").length;
         newLines[i] = "\u00A0";
         continue;
@@ -53,14 +53,14 @@ const ScreenInterpreter = ({
       // Postęp
       const codes = [...line].map((ch) => ch.charCodeAt(0));
       const progressCodes = codes.filter(
-        (code) => code >= 0x03 && code <= 0x07
+        (code) => code >= 0x03 && code <= 0x07,
       );
       if (progressCodes.length > 0) {
         setLoading(true);
         foundProgress = true;
         const sum = progressCodes.reduce((a, b) => a + b, 0);
         const percent = Math.round((sum / 126) * 100);
-        console.log(percent);
+        // console.log(percent);
         if (percent == 100) {
           setReady(true);
         }
@@ -96,7 +96,6 @@ const ScreenInterpreter = ({
         if (hasDigits) {
           lastValidPriceLine.current = line;
 
-          // Wyciągnij wartość ceny jako float, np. "Cena =      000.60"
           const match = line.match(/(\d+\.\d{2})/);
           currentPrice = match ? parseFloat(match[1]) : null;
         } else if (lastValidPriceLine.current) {

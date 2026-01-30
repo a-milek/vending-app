@@ -20,7 +20,7 @@ function App() {
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasCredit, setHasCredit] = useState(false);
-  const [isOrdering, setIsOrdering] = useState(false);
+  const [] = useState(false);
 
   // --- Price & order control ---
   const [current, setCurrentPrice] = useState<number | null>(null);
@@ -29,6 +29,7 @@ function App() {
   useEffect(() => {
     currentPriceRef.current = current;
   }, [current]);
+  const lastProductRef = useRef<string | number | null>(null);
 
   // --- Coffee List ---
   const [coffeeList, setCoffeeList] = useState(() => {
@@ -124,52 +125,88 @@ function App() {
   });
 
   // --- Order Logic ---
-  const placeOrder = async (servId: string | number) => {
-    console.log(servId);
+  const click_button = async (servId: string | number) => {
+    console.log("order start", servId);
     try {
-      const res = await fetch("order", {
+      const res = await fetch("/vending-machines/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ servId }),
       });
-      if (!res.ok) throw new Error("Order failed");
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Order failed");
+      }
+
       return await res.json();
     } catch (err) {
       console.error("Order error:", err);
+      return null;
+    }
+  };
+  const finishedRef = useRef(false);
+
+  useEffect(() => {
+    if (ready && lastProductRef.current != null && !finishedRef.current) {
+      finishedRef.current = true;
+      product_finished(lastProductRef.current);
+    }
+
+    if (!ready) {
+      finishedRef.current = false;
+    }
+  }, [ready]);
+  const product_finished = async (product_id: string | number | null) => {
+    if (product_id == null) return;
+
+    console.log("called product_finished", product_id);
+
+    try {
+      const res = await fetch("/vending-machines/statservice/order_complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product_id }),
+      });
+
+      if (!res.ok) throw new Error("Statservice failed");
+      return await res.json();
+    } catch (err) {
+      console.error("Statservice error:", err);
     }
   };
 
-  const firstClickHandled = useRef(false);
   const handleCoffeeSelection = async (index: number) => {
-    if (!tech && isOrdering) return;
+    if (!tech && current !== null) return;
 
     const coffee = coffeeList[index];
+    lastProductRef.current = coffee.servId;
 
     // Start lockout on first click only
-    if (!tech && !firstClickHandled.current) {
-      setIsOrdering(true);
-      firstClickHandled.current = true;
-      setTimeout(() => {
-        setIsOrdering(false);
-        firstClickHandled.current = false; // reset for next series
-      }, 7000);
-    }
-    try {
-      // --- Special case: zbożowa ---
-      if (
-        coffee.name.toLowerCase().includes("zbożowa") ||
-        coffee.name.toLowerCase().includes("zbożowe")
-      ) {
-        await placeOrder(11);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
+    // if (!tech && !firstClickHandled.current) {
+    //   setIsOrdering(true);
+    //   firstClickHandled.current = true;
+    //   setTimeout(() => {
+    //     setIsOrdering(false);
+    //     firstClickHandled.current = false; // reset for next series
+    //   }, 7000);
+    // }
+    // try {
+    //   // --- Special case: zbożowa ---
+    //   if (
+    //     coffee.name.toLowerCase().includes("zbożowa") ||
+    //     coffee.name.toLowerCase().includes("zbożowe")
+    //   ) {
+    //     await click_button(key_config.enter);
+    //     await new Promise((resolve) => setTimeout(resolve, 1000));
+    //   }
 
-      await placeOrder(coffee.servId);
-    } catch (err) {
-      console.error("Order failed:", err);
-    } finally {
-      if (!tech) setTimeout(() => setIsOrdering(false), 7000);
-    }
+    //   await click_button(coffee.servId);
+    // } catch (err) {
+    //   console.error("Order failed:", err);
+    // } finally {
+    //   if (!tech) setTimeout(() => setIsOrdering(false), 7000);
+    // }
   };
 
   useEffect(() => {
@@ -188,7 +225,7 @@ function App() {
         <VisuallyHidden>
           <SugarPanel
             tech={tech}
-            onClick={placeOrder}
+            onClick={click_button}
             lines={lines}
             setTech={setTech}
             setProgress={setProgress}
@@ -216,12 +253,11 @@ function App() {
 
         {loading || ready ? (
           <>
-            console.log(loading);
             <LoadingScreen progress={progress} ready={ready} />
             <VisuallyHidden>
               <SugarPanel
                 tech={tech}
-                onClick={placeOrder}
+                onClick={click_button}
                 lines={lines}
                 setTech={setTech}
                 setProgress={setProgress}
@@ -237,7 +273,7 @@ function App() {
         ) : (
           <>
             <SugarPanel
-              onClick={placeOrder}
+              onClick={click_button}
               lines={lines}
               setTech={setTech}
               setProgress={setProgress}
@@ -251,7 +287,7 @@ function App() {
             />
             {tech && (
               <TechKeyboard
-                onClick={placeOrder}
+                onClick={click_button}
                 getCurrentPrice={getCurrentPrice}
               />
             )}
@@ -261,6 +297,7 @@ function App() {
               setCoffeeList={setCoffeeList}
               onClick={handleCoffeeSelection}
               tech={tech}
+              disabled={!tech && current !== null}
             />
           </>
         )}
