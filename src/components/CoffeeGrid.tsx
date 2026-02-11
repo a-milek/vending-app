@@ -160,7 +160,7 @@ const CoffeeGrid = ({
               cursor="none"
             >
               <Image
-                src={coffee.image || "assets/icons/13.png"}
+                src={coffee.image || "assets/icons/empty.png"}
                 alt={coffee.name}
                 width="100%"
                 borderRadius="lg"
