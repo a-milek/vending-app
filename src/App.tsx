@@ -57,7 +57,7 @@ function App() {
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const connectWebSocket = useCallback(() => {
-    ws.current = new WebSocket("ws://0.0.0.0:8765/");
+    ws.current = new WebSocket(`ws://${window.location.hostname}:8765/`);
     ws.current.onopen = () => setWsConnected(true);
 
     ws.current.onmessage = (event) => {
