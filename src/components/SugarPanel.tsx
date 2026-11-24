@@ -33,7 +33,7 @@ const SugarPanel = ({
     <>
       <HStack gap={5} py={2} paddingTop="40px" width="70%" mx="auto">
         <Box
-          width="33%"
+          width="28%"
           style={
             {
               touchAction: "none",
@@ -57,7 +57,7 @@ const SugarPanel = ({
         <Flex
           justify="center"
           align="center"
-          width={"33%"}
+          width={"44%"}
           style={
             {
               touchAction: "none",
@@ -82,7 +82,7 @@ const SugarPanel = ({
         </Flex>
 
         <Box
-          width="33%"
+          width="28%"
           style={
             {
               touchAction: "none",
