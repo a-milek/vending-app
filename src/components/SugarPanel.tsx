@@ -103,24 +103,6 @@ const SugarPanel = ({
           />
         </Box>
       </HStack>
-      {/* <VStack gap={2} paddingY={2} height="7vh">
-        <SimpleGrid columns={1} gap={3} height="100%" width="80%" mx="auto">
-          <GridItem>
-            <Button
-              onClick={() => onClick(key_config.cukier)}
-              {...ButtonStyle}
-              flexDirection="column"
-            >
-              <Text fontSize="2xl" color="whiteAlpha.800" paddingBottom={2}>
-                wciśnij przed wyborem
-              </Text>
-              <Text fontSize="3xl" color="white" fontWeight="bold">
-                DODATKOWY CUKIER
-              </Text>
-            </Button>
-          </GridItem>
-        </SimpleGrid>
-      </VStack> */}
     </>
   );
 };

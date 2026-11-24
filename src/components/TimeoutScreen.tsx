@@ -31,7 +31,7 @@ const TimeoutScreen = () => {
             src={selectedAd}
             alt="Advertisement"
             objectFit="contain"
-            width="100%"
+            width="99%"
             height="100%"
           />
         </Flex>
