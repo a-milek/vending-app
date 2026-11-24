@@ -181,6 +181,7 @@ function App() {
 
     const coffee = coffeeList[index];
     lastProductRef.current = coffee.servId;
+    await click_button(coffee.servId);
 
     // Start lockout on first click only
     // if (!tech && !firstClickHandled.current) {

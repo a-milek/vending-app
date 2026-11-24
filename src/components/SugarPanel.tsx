@@ -31,7 +31,7 @@ const SugarPanel = ({
 }: Props) => {
   return (
     <>
-      <HStack gap={5} py={2} paddingTop="40px" width="80%" mx="auto">
+      <HStack gap={5} py={2} paddingTop="40px" width="70%" mx="auto">
         <Box
           width="33%"
           style={

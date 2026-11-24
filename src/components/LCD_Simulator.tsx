@@ -41,7 +41,7 @@ const LCD_Simulator = ({ lines, sugar, tech }: Props) => {
           {tech ? null : (
             <HStack justify="center" alignSelf="flex-end">
               {sugar != 0
-                ? Array.from({ length: 3 }).map((_, i) => (
+                ? Array.from({ length: 5 }).map((_, i) => (
                     <Box
                       key={i}
                       boxSize="30px" // ← tweak size here if needed

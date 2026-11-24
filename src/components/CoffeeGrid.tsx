@@ -6,7 +6,7 @@ import {
   Button,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PriceEditModal from "./PriceEditModal";
 import NameEditModal from "./NameEditModal";
 import PhotoEditModal from "./PhotoEditModal";
@@ -68,15 +68,15 @@ const CoffeeGrid = ({
     updateStorage(updated);
   };
 
-  // useEffect(() => {
-  //   if (selectedIndex !== null) {
-  //     const timeout = setTimeout(() => {
-  //       setSelectedIndex(null);
-  //     }, 7000); // 7 seconds
+  useEffect(() => {
+    if (selectedIndex !== null) {
+      const timeout = setTimeout(() => {
+        setSelectedIndex(null);
+      }, 27000); // 27 seconds
 
-  //     return () => clearTimeout(timeout); // Cleanup if index changes before 10s
-  //   }
-  // }, [selectedIndex]);
+      return () => clearTimeout(timeout);
+    }
+  }, [selectedIndex]);
 
   const handleIndexChange = (index: number, inputValue: string) => {
     const n = parseInt(inputValue, 10);
@@ -140,11 +140,11 @@ const CoffeeGrid = ({
   return (
     <>
       <SimpleGrid
-        columns={3}
+        columns={tech ? 5 : 3}
         gap={5}
         paddingY={5}
         height="100%"
-        width={tech ? "50%" : "80%"}
+        width={tech ? "50%" : "70%"}
         mx="auto"
       >
         {coffeeList.map((coffee, index) => (
